@@ -28,12 +28,37 @@ async def kick(ctx, member : discord.Member, *, reason=None):
   await member.kick(reason=reason)
 
 @client.command()
-async def bank(ctx, member : discord.Member, *, reason=None):
+async def ban(ctx, member : discord.Member, *, reason=None):
   await member.ban(reason=reason)
 
 # Command to send
 # .kick @account
 # .ban @account Spam Account
+
+#### Unban: Part 6
+
+# We get access to the Member object with discord.Member
+# But the member must be part of the channel to give us that object
+# After banning the member is out of the channel
+# So we can't get that object normally
+@client.command()
+async def bank(ctx, *, member):
+  # the asterisk is here because account names can contain spaces
+  banned_users = await ctx.guild.bans()
+  # this function returns all the banned users on the server
+  # returns a named tuple
+  member_name, member_discriminator = member.split("#")
+  # account: anyfactor#8591
+
+  for ban_entry in banned_users:
+    user = ban_entry.user
+    if (user.name, user.discriminator) == (member_name, member_discriminator):
+      await ctx.guild.unban(user)
+      # await ctx.send(f"Unbanned {user.name}#{user.discriminator}")
+      # this is essentially the same as this but this string mentions
+      await ctx.send(f"Unbanned {user.mention}")
+      return
+
 
 
 
